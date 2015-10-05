@@ -30,4 +30,12 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>nevik</groupId>
+			<artifactId>autodiff-expressions</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
 </project>
