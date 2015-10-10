@@ -44,10 +44,10 @@ import static nevik.autodiff.expr.real.RealExprReciprocal.reRecip;
 public class VisitorRealExpressionPartialDifferentiator
 		extends AbstractVisitorRealExpression<PartialDiffParams, RealExpression, RealExpression, Void> {
 	public static final class PartialDiffParams {
-		public final RealVariable dx;
+		public final RealVariable x; // the variable with respect to which we're differentiating
 
-		public PartialDiffParams(final RealVariable dx) {
-			this.dx = dx;
+		public PartialDiffParams(final RealVariable x) {
+			this.x = x;
 		}
 	}
 
@@ -59,6 +59,14 @@ public class VisitorRealExpressionPartialDifferentiator
 					RealExprMultiplication.class, //
 					RealExprNegation.class, //
 					RealExprReciprocal.class)));
+
+	public static RealExpression differentiate(final RealExpression rootExpression, final PartialDiffParams params) {
+		return new VisitorRealExpressionPartialDifferentiator(rootExpression, params).evaluate();
+	}
+
+	public static RealExpression differentiate(final RealExpression rootExpression, final RealVariable x) {
+		return new VisitorRealExpressionPartialDifferentiator(rootExpression, new PartialDiffParams(x)).evaluate();
+	}
 
 	public VisitorRealExpressionPartialDifferentiator(final RealExpression rootExpression,
 			final PartialDiffParams params) {
@@ -72,7 +80,7 @@ public class VisitorRealExpressionPartialDifferentiator
 		}
 
 		// if the root expression does not contain the variable with respect to which we are deriving, the result is 0
-		if (!this.rootExpression.getVariables().contains(this.params.dx)) {
+		if (!this.rootExpression.getVariables().contains(this.params.x)) {
 			return ZERO;
 		}
 
@@ -87,9 +95,9 @@ public class VisitorRealExpressionPartialDifferentiator
 
 	@Override
 	public RealExpression visit(final RealVariable realVariable, final Void state) {
-		// partial derivative of a variable is 1 iff it is the variable we are deriving for (dx);
-		// any other variable is constant w.r.t. dx, so the result is zero
-		return (realVariable == this.params.dx) ? ONE : ZERO;
+		// partial derivative of a variable is 1 iff it is the variable we are deriving for (x);
+		// any other variable is constant w.r.t. x, so the result is zero
+		return (realVariable == this.params.x) ? ONE : ZERO;
 	}
 
 	@Override

@@ -20,9 +20,6 @@ import nevik.autodiff.expr.real.RealExprAddition;
 import nevik.autodiff.expr.real.RealExprMultiplication;
 import nevik.autodiff.expr.real.RealExpression;
 import nevik.autodiff.expr.real.RealVariable;
-import nevik.autodiff.expr.real.visitor.VisitorRealExpressionPartialDifferentiator;
-import nevik.autodiff.expr.real.visitor.VisitorRealExpressionPartialDifferentiator.PartialDiffParams;
-import nevik.autodiff.expr.real.visitor.VisitorRealExpressionPrintingInfix;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -34,6 +31,9 @@ import static nevik.autodiff.expr.real.RealExprAddition.reAdd;
 import static nevik.autodiff.expr.real.RealExprMultiplication.reMult;
 import static nevik.autodiff.expr.real.RealExprNegation.reNeg;
 import static nevik.autodiff.expr.real.RealExprReciprocal.reRecip;
+import static nevik.autodiff.expr.real.visitor.VisitorRealExpressionPartialDifferentiator.differentiate;
+import static nevik.autodiff.expr.real.visitor.VisitorRealExpressionPrintingInfix.printExpression;
+import static nevik.autodiff.expr.real.visitor.VisitorRealExpressionSimplifier.simplify;
 
 /**
  * @author Patrick Lehner
@@ -50,9 +50,13 @@ public class TestMain {
 		final RealExprMultiplication m = reMult(reCons(4.0), x);
 		final RealExpression e = reAdd(x, reNeg(x), reMult(reCons(-4), x), reRecip(x));
 
-		new VisitorRealExpressionPrintingInfix(new VisitorRealExpressionPartialDifferentiator(a, new PartialDiffParams(x)).evaluate(), varMap).evaluate();
+		printExpression(differentiate(a, x), varMap);
 		System.out.println();
-		new VisitorRealExpressionPrintingInfix(new VisitorRealExpressionPartialDifferentiator(m, new PartialDiffParams(x)).evaluate(), varMap).evaluate();
+		printExpression(differentiate(m, x), varMap);
 		System.out.println();
-		new VisitorRealExpressionPrintingInfix(new VisitorRealExpressionPartialDifferentiator(e, new PartialDiffParams(x)).evaluate(), varMap).evaluate();
-	}}
+		final RealExpression d = differentiate(e, x);
+		printExpression(d, varMap);
+		System.out.println("=");
+		printExpression(simplify(d), varMap);
+	}
+}
